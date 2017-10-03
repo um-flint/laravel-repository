@@ -1,6 +1,12 @@
-## Methods
+# Table of Contents
+- [Methods](#methods)
+    - [RepositoryInterface](#repository-interface)
+    - [Traits](#traits)
+        - [SoftDeletes](#soft-deletes)
 
-### src/Contracts/RepositoryInterface
+## Methods <a name="methods"></a>
+
+### UMFlint\Repository\Contracts\RepositoryInterface <a name="repository-interface"></a>
 - lists($column, $key = null)
 - pluck($column, $key = null)
 - sync($id, $relation, $attributes, $detaching = true)
@@ -25,3 +31,15 @@
 - visible(array $fields)
 - scopeQuery(\Closure $scope)
 - resetScope()
+
+## Traits <a name="traits"></a>
+
+### UMFlint\Traits\SoftDeletes <a name="soft-deletes"></a>
+This trait allows for soft deletes:
+- delete($id, $force = false)
+
+In order to query for deleted entities:
+- withTrashed()
+
+To restore a soft deleted entity:
+- restore($id)

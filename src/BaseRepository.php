@@ -380,6 +380,27 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * Hook before deleting entity.
+     *
+     * @param Model $model
+     */
+    public function beforeDelete(Model &$model)
+    {
+        //
+    }
+
+    /**
+     * Hook after deleting entity.
+     *
+     * @param Model $model
+     * @param bool  $deleted
+     */
+    public function afterDelete(Model $model, bool $deleted)
+    {
+        //
+    }
+
+    /**
      * Delete a entity in repository by id
      *
      * @param $id
@@ -390,9 +411,12 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->applyScope();
         $model = $this->find($id);
+        $this->beforeDelete($model);
         $this->resetModel();
+        $deleted = $model->delete();
+        $this->afterDelete($model, $deleted);
 
-        return $model->delete();
+        return $deleted;
     }
 
     /**

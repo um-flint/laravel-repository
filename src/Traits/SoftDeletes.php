@@ -32,12 +32,10 @@ trait SoftDeletes
         $this->resetModel();
 
         if ($force) {
-            $deleted = $model->forceDelete();
-        }else {
-            $deleted = $model->delete();
+            return $model->forceDelete();
         }
 
-        return $deleted;
+        return $model->delete();
     }
 
     /**

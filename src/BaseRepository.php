@@ -3,11 +3,14 @@
 namespace UMFlint\Repository;
 
 use Illuminate\Contracts\Container\Container as Application;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use UMFlint\Repository\Contracts\closure;
 use UMFlint\Repository\Contracts\RepositoryInterface;
 use UMFlint\Repository\Contracts\ValidatorException;
+use UMFlint\Repository\Rules\BaseRules;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -20,8 +23,6 @@ abstract class BaseRepository implements RepositoryInterface
      * @var Model
      */
     protected $model;
-
-    protected $validator;
 
     /**
      * @var Collection
@@ -57,11 +58,11 @@ abstract class BaseRepository implements RepositoryInterface
     abstract public function model(): string;
 
     /**
-     * Specify validtor class name
+     * Rules class or array of rules.
      *
      * @return string
      */
-    abstract public function validator(): string;
+    abstract public function rules();
 
     /**
      * Create a new instance of the model.
@@ -91,9 +92,40 @@ abstract class BaseRepository implements RepositoryInterface
         $this->makeModel();
     }
 
-    public function makeValidator()
+    /**
+     * Validate attributes.
+     *
+     * @author Donald Wilcox <dowilcox@umflint.edu>
+     * @param array $attributes
+     * @throws \Exception
+     */
+    protected function passesOrFailsValidation(array $attributes)
     {
+        $factory = $this->app->make(ValidationFactory::class);
+        $rules = $this->rules();
 
+        if (is_array($rules)) {
+            $messages = [];
+        }else {
+            $rulesClass = new $rules;
+
+            if (!$rulesClass instanceof BaseRules) {
+                throw new \Exception("Class {$rulesClass} must be an instances of UMFlint\\Repository\\Rules\\BaseRules");
+            }
+
+            $rules = $rulesClass::getRules();
+            $messages = $rulesClass::getMessages();
+        }
+
+        if (count($rules) === 0) {
+            return;
+        }
+
+        $validator = $factory->make($attributes, $rules, $messages);
+
+        if (!$validator->passes()) {
+            throw new ValidationException($validator);
+        }
     }
 
     /**
@@ -325,7 +357,9 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function create(array $attributes)
     {
-        // TODO: Implement validation support.
+        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
+        $this->passesOrFailsValidation($attributes);
+
         $this->beforeCreate($attributes);
         $model = $this->model->newInstance($attributes);
         $model->save();
@@ -368,7 +402,10 @@ abstract class BaseRepository implements RepositoryInterface
     public function update(array $attributes, $id)
     {
         $this->applyScope();
-        // TODO: Implement validation support.
+
+        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
+        $this->passesOrFailsValidation($attributes);
+
         $model = $this->model->findOrFail($id);
         $this->beforeUpdate($model, $attributes);
         $model->fill($attributes);
@@ -377,6 +414,27 @@ abstract class BaseRepository implements RepositoryInterface
         $this->resetModel();
 
         return $model;
+    }
+
+    /**
+     * Hook before deleting entity.
+     *
+     * @param Model $model
+     */
+    public function beforeDelete(Model &$model)
+    {
+        //
+    }
+
+    /**
+     * Hook after deleting entity.
+     *
+     * @param Model $model
+     * @param bool  $deleted
+     */
+    public function afterDelete(Model $model, bool $deleted)
+    {
+        //
     }
 
     /**
@@ -390,9 +448,12 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->applyScope();
         $model = $this->find($id);
+        $this->beforeDelete($model);
         $this->resetModel();
+        $deleted = $model->delete();
+        $this->afterDelete($model, $deleted);
 
-        return $model->delete();
+        return $deleted;
     }
 
     /**

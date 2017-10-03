@@ -60,9 +60,9 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Rules class or array of rules.
      *
-     * @return string
+     * @return array
      */
-    abstract public function rules();
+    abstract public function rules(): array;
 
     /**
      * Create a new instance of the model.
@@ -102,26 +102,7 @@ abstract class BaseRepository implements RepositoryInterface
     protected function passesOrFailsValidation(array $attributes)
     {
         $factory = $this->app->make(ValidationFactory::class);
-        $rules = $this->rules();
-
-        if (is_array($rules)) {
-            $messages = [];
-        }else {
-            $rulesClass = new $rules;
-
-            if (!$rulesClass instanceof BaseRules) {
-                throw new \Exception("Class {$rulesClass} must be an instances of UMFlint\\Repository\\Rules\\BaseRules");
-            }
-
-            $rules = $rulesClass::getRules();
-            $messages = $rulesClass::getMessages();
-        }
-
-        if (count($rules) === 0) {
-            return;
-        }
-
-        $validator = $factory->make($attributes, $rules, $messages);
+        $validator = $factory->make($attributes, $this->rules());
 
         if (!$validator->passes()) {
             throw new ValidationException($validator);

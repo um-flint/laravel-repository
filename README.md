@@ -9,11 +9,11 @@
 ## Hooks <a name="hooks"></a>
 
 ##### Create
-- beforeCreate(array &$attributes)
+- beforeCreate(&$attributes)
 - afterCreate($model, &$attributes)
 
 ##### Update
-- beforeUpdate(array &$attributes)
+- beforeUpdate(&$attributes)
 - afterUpdate($model, &$attributes)
 
 ##### Delete

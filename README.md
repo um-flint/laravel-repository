@@ -57,7 +57,7 @@ Anything that needs to happen when the repository class is created. Uses Laravel
 - afterCreate($model, &$attributes)
 
 ##### Update
-- beforeUpdate(&$attributes)
+- beforeUpdate($model, &$attributes)
 - afterUpdate($model, &$attributes)
 
 ##### Delete

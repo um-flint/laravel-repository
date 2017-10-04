@@ -385,7 +385,6 @@ abstract class BaseRepository implements RepositoryInterface
 
         $this->resetModel();
         $deleted = $model->delete();
-        $this->afterDelete($model, $deleted);
 
         if (method_exists($this, 'afterDelete')) {
             call_user_func_array([$this, 'afterDelete'], [$model, $deleted]);

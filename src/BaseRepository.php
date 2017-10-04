@@ -318,12 +318,12 @@ abstract class BaseRepository implements RepositoryInterface
     public function create(array $attributes)
     {
         $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
-        $this->passesOrFailsValidation($attributes);
 
         if (method_exists($this, 'beforeCreate')) {
             $this->app->call([$this, 'beforeCreate'], [$attributes]);
         }
 
+        $this->passesOrFailsValidation($attributes);
         $model = $this->model->newInstance($attributes);
         $model->save();
 
@@ -347,16 +347,14 @@ abstract class BaseRepository implements RepositoryInterface
     public function update(array $attributes, $id)
     {
         $this->applyScope();
-
         $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
-        $this->passesOrFailsValidation($attributes);
-
         $model = $this->model->findOrFail($id);
 
         if (method_exists($this, 'beforeUpdate')) {
             $this->app->call([$this, 'beforeUpdate'], [$model, $attributes]);
         }
 
+        $this->passesOrFailsValidation($attributes);
         $model->fill($attributes);
         $model->save();
 

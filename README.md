@@ -1,9 +1,26 @@
 # Table of Contents
+- [Hooks](#hooks) 
 - [Methods](#methods)
     - [RepositoryInterface](#repository-interface)
     - [Traits](#traits)
         - [SoftDeletes](#soft-deletes)
-- [Validation](#validation)        
+- [Validation](#validation)     
+
+## Hooks <a name="hooks"></a>
+
+##### Create
+- beforeCreate(&$attributes)
+- afterCreate($model, &$attributes)
+
+##### Update
+- beforeUpdate(&$attributes)
+- afterUpdate($model, &$attributes)
+
+##### Delete
+- afterDelete($model, $deleted)
+
+##### Restore
+- afterRestore($model)
 
 ## Methods <a name="methods"></a>
 

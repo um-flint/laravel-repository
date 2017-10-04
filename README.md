@@ -3,7 +3,8 @@
     - [RepositoryInterface](#repository-interface)
     - [Traits](#traits)
         - [SoftDeletes](#soft-deletes)
-- [Validation](#validation)        
+- [Validation](#validation)
+- [Hooks](#Hooks)      
 
 ## Methods <a name="methods"></a>
 
@@ -107,3 +108,19 @@ class AnnouncementRepository extends BaseRepository
     }
 }
 ```
+
+## Hooks <a name="hooks"></a>
+
+#### Create
+- beforeCreate(array &$attributes)
+- afterCreate(Model $model, array &$attributes)
+
+#### Update
+- beforeUpdate(array &$attributes)
+- afterUpdate(Model $model, array &$attributes)
+
+#### Delete
+- afterDelete(Model $model, bool $deleted)
+
+#### Restore
+- afterRestore(Model $model)

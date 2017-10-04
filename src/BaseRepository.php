@@ -10,7 +10,6 @@ use Illuminate\Validation\ValidationException;
 use UMFlint\Repository\Contracts\closure;
 use UMFlint\Repository\Contracts\RepositoryInterface;
 use UMFlint\Repository\Contracts\ValidatorException;
-use UMFlint\Repository\Rules\BaseRules;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -18,6 +17,11 @@ abstract class BaseRepository implements RepositoryInterface
      * @var Application
      */
     protected $app;
+
+    /**
+     * @var ValidationFactory
+     */
+    protected $validation;
 
     /**
      * @var Model
@@ -32,22 +36,19 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * BaseRepository constructor.
      *
-     * @param Application $app
+     * @param Application       $app
+     * @param ValidationFactory $validation
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, ValidationFactory $validation)
     {
         $this->app = $app;
+        $this->validation = $validation;
         $this->scopeQuery = new Collection();
         $this->makeModel();
-        $this->boot();
-    }
 
-    /**
-     * Anything that needs to happen when the class is created.
-     */
-    public function boot()
-    {
-        //
+        if (method_exists($this, 'boot')) {
+            $this->app->call([$this, 'boot']);
+        }
     }
 
     /**
@@ -101,8 +102,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function passesOrFailsValidation(array $attributes)
     {
-        $factory = $this->app->make(ValidationFactory::class);
-        $validator = $factory->make($attributes, $this->rules());
+        $validator = $this->validation->make($attributes, $this->rules());
 
         if (!$validator->passes()) {
             throw new ValidationException($validator);
@@ -309,27 +309,6 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * Hook before saving in creation.
-     *
-     * @param array $attributes
-     */
-    public function beforeCreate(array &$attributes)
-    {
-        //
-    }
-
-    /**
-     * Hook after saving in creation.
-     *
-     * @param Model $model
-     * @param array $attributes
-     */
-    public function afterCreate(Model &$model, array &$attributes)
-    {
-        //
-    }
-
-    /**
      * Save a new entity in repository
      *
      * @param array $attributes
@@ -341,35 +320,20 @@ abstract class BaseRepository implements RepositoryInterface
         $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
         $this->passesOrFailsValidation($attributes);
 
-        $this->beforeCreate($attributes);
+        if (method_exists($this, 'beforeCreate')) {
+            $this->app->call([$this, 'beforeCreate'], [$attributes]);
+        }
+
         $model = $this->model->newInstance($attributes);
         $model->save();
-        $this->afterCreate($model, $attributes);
+
+        if (method_exists($this, 'afterCreate')) {
+            $this->app->call([$this, 'afterCreate'], [$model, $attributes]);
+        }
+
         $this->resetModel();
 
         return $model;
-    }
-
-    /**
-     * Hook before saving in updating.
-     *
-     * @param Model $model
-     * @param array $attributes
-     */
-    public function beforeUpdate(Model &$model, array &$attributes)
-    {
-        //
-    }
-
-    /**
-     * Hook after saving in updating.
-     *
-     * @param Model $model
-     * @param array $attributes
-     */
-    public function afterUpdate(Model &$model, array &$attributes)
-    {
-        //
     }
 
     /**
@@ -388,34 +352,21 @@ abstract class BaseRepository implements RepositoryInterface
         $this->passesOrFailsValidation($attributes);
 
         $model = $this->model->findOrFail($id);
-        $this->beforeUpdate($model, $attributes);
+
+        if (method_exists($this, 'beforeUpdate')) {
+            $this->app->call([$this, 'beforeUpdate'], [$model, $attributes]);
+        }
+
         $model->fill($attributes);
         $model->save();
-        $this->afterUpdate($model, $attributes);
+
+        if (method_exists($this, 'afterUpdate')) {
+            $this->app->call([$this, 'afterUpdate'], [$model, $attributes]);
+        }
+
         $this->resetModel();
 
         return $model;
-    }
-
-    /**
-     * Hook before deleting entity.
-     *
-     * @param Model $model
-     */
-    public function beforeDelete(Model &$model)
-    {
-        //
-    }
-
-    /**
-     * Hook after deleting entity.
-     *
-     * @param Model $model
-     * @param bool  $deleted
-     */
-    public function afterDelete(Model $model, bool $deleted)
-    {
-        //
     }
 
     /**
@@ -429,10 +380,18 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->applyScope();
         $model = $this->find($id);
-        $this->beforeDelete($model);
+
+        if (method_exists($this, 'beforeDelete')) {
+            $this->app->call([$this, 'beforeDelete'], [$model]);
+        }
+
         $this->resetModel();
         $deleted = $model->delete();
         $this->afterDelete($model, $deleted);
+
+        if (method_exists($this, 'afterDelete')) {
+            $this->app->call([$this, 'afterDelete'], [$model, $deleted]);
+        }
 
         return $deleted;
     }

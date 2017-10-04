@@ -31,11 +31,21 @@ trait SoftDeletes
         $model = $this->find($id);
         $this->resetModel();
 
-        if ($force) {
-            return $model->forceDelete();
+        if (method_exists($this, 'beforeDelete')) {
+            $this->app->call([$this, 'beforeDelete'], [$model]);
         }
 
-        return $model->delete();
+        if ($force) {
+            $deleted = $model->forceDelete();
+        }else {
+            $deleted = $model->delete();
+        }
+
+        if (method_exists($this, 'afterDelete')) {
+            $this->app->call([$this, 'afterDelete'], [$model, $deleted]);
+        }
+
+        return $deleted;
     }
 
     /**
@@ -49,8 +59,18 @@ trait SoftDeletes
     {
         $this->applyScope();
         $model = $this->find($id);
-        $this->resetModel();
 
-        return $model->restore();
+        if (method_exists($this, 'beforeRestore')) {
+            $this->app->call([$this, 'beforeRestore'], [$model]);
+        }
+
+        $this->resetModel();
+        $restored = $model->restore();
+
+        if (method_exists($this, 'beforeRestore')) {
+            $this->app->call([$this, 'beforeRestore'], [$model]);
+        }
+
+        return $restored;
     }
 }

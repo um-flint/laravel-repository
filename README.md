@@ -10,17 +10,17 @@
 
 ##### Create
 - beforeCreate(array &$attributes)
-- afterCreate(Model $model, array &$attributes)
+- afterCreate($model, &$attributes)
 
 ##### Update
 - beforeUpdate(array &$attributes)
-- afterUpdate(Model $model, array &$attributes)
+- afterUpdate($model, &$attributes)
 
 ##### Delete
-- afterDelete(Model $model, bool $deleted)
+- afterDelete($model, $deleted)
 
 ##### Restore
-- afterRestore(Model $model)
+- afterRestore($model)
 
 ## Methods <a name="methods"></a>
 

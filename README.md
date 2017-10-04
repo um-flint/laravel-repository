@@ -1,26 +1,10 @@
 # Table of Contents
-- [Hooks](#hooks) 
 - [Methods](#methods)
     - [RepositoryInterface](#repository-interface)
     - [Traits](#traits)
         - [SoftDeletes](#soft-deletes)
+- [Hooks](#hooks) 
 - [Validation](#validation)     
-
-## Hooks <a name="hooks"></a>
-
-##### Create
-- beforeCreate(&$attributes)
-- afterCreate($model, &$attributes)
-
-##### Update
-- beforeUpdate(&$attributes)
-- afterUpdate($model, &$attributes)
-
-##### Delete
-- afterDelete($model, $deleted)
-
-##### Restore
-- afterRestore($model)
 
 ## Methods <a name="methods"></a>
 
@@ -62,6 +46,28 @@ In order to query for deleted entities:
 To restore a soft deleted entity:
 - restore($id)
 
+## Hooks <a name="hooks"></a>
+
+##### Boot
+Anything that needs to happen when the repository class is created. Uses Laravels container for automatic injection.
+- boot()
+
+##### Create
+- beforeCreate(&$attributes)
+- afterCreate($model, &$attributes)
+
+##### Update
+- beforeUpdate(&$attributes)
+- afterUpdate($model, &$attributes)
+
+##### Delete
+- beforeDelete($model)
+- afterDelete($model, $deleted)
+
+##### Restore
+- beforeRestore($model)
+- afterRestore($model)
+
 ## Validation <a name="validation"></a>
 Example rules:
 ```php
@@ -75,11 +81,6 @@ use UMFlint\Repository\Rules\BaseRules;
 
 class AnnouncementRules extends BaseRules
 {
-    /**
-     * Array of rules.
-     *
-     * @return array
-     */
     protected function rules(): array
     {
         return [
@@ -105,19 +106,11 @@ use UMFlint\Repository\BaseRepository;
 
 class AnnouncementRepository extends BaseRepository
 {
-    /**
-     * @inheritdoc
-     */
     public function model(): string
     {
         return Announcement::class;
     }
 
-    /**
-     * Array of rules.
-     *
-     * @return array
-     */
     public function rules(): array
     {
         return AnnouncementRules::getRules();

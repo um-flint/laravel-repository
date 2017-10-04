@@ -4,7 +4,7 @@
     - [Traits](#traits)
         - [SoftDeletes](#soft-deletes)
 - [Validation](#validation)
-- [Hooks](#Hooks)      
+- [Hooks](#hooks)      
 
 ## Methods <a name="methods"></a>
 

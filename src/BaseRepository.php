@@ -320,7 +320,7 @@ abstract class BaseRepository implements RepositoryInterface
         $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
 
         if (method_exists($this, 'beforeCreate')) {
-            $this->app->call([$this, 'beforeCreate'], [$attributes]);
+            call_user_func_array([$this, 'beforeCreate'], [&$attributes]);
         }
 
         $this->passesOrFailsValidation($attributes);
@@ -328,7 +328,7 @@ abstract class BaseRepository implements RepositoryInterface
         $model->save();
 
         if (method_exists($this, 'afterCreate')) {
-            $this->app->call([$this, 'afterCreate'], [$model, $attributes]);
+            call_user_func_array([$this, 'afterCreate'], [$model, &$attributes]);
         }
 
         $this->resetModel();
@@ -351,7 +351,7 @@ abstract class BaseRepository implements RepositoryInterface
         $model = $this->model->findOrFail($id);
 
         if (method_exists($this, 'beforeUpdate')) {
-            $this->app->call([$this, 'beforeUpdate'], [$model, $attributes]);
+            call_user_func_array([$this, 'beforeUpdate'], [$model, &$attributes]);
         }
 
         $this->passesOrFailsValidation($attributes);
@@ -359,7 +359,7 @@ abstract class BaseRepository implements RepositoryInterface
         $model->save();
 
         if (method_exists($this, 'afterUpdate')) {
-            $this->app->call([$this, 'afterUpdate'], [$model, $attributes]);
+            call_user_func_array([$this, 'afterUpdate'], [$model, &$attributes]);
         }
 
         $this->resetModel();
@@ -380,7 +380,7 @@ abstract class BaseRepository implements RepositoryInterface
         $model = $this->find($id);
 
         if (method_exists($this, 'beforeDelete')) {
-            $this->app->call([$this, 'beforeDelete'], [$model]);
+            call_user_func_array([$this, 'beforeDelete'], [$model]);
         }
 
         $this->resetModel();
@@ -388,7 +388,7 @@ abstract class BaseRepository implements RepositoryInterface
         $this->afterDelete($model, $deleted);
 
         if (method_exists($this, 'afterDelete')) {
-            $this->app->call([$this, 'afterDelete'], [$model, $deleted]);
+            call_user_func_array([$this, 'afterDelete'], [$model, $deleted]);
         }
 
         return $deleted;

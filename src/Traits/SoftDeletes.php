@@ -32,7 +32,7 @@ trait SoftDeletes
         $this->resetModel();
 
         if (method_exists($this, 'beforeDelete')) {
-            $this->app->call([$this, 'beforeDelete'], [$model]);
+            call_user_func_array([$this, 'beforeDelete'], [$model]);
         }
 
         if ($force) {
@@ -42,7 +42,7 @@ trait SoftDeletes
         }
 
         if (method_exists($this, 'afterDelete')) {
-            $this->app->call([$this, 'afterDelete'], [$model, $deleted]);
+            call_user_func_array([$this, 'afterDelete'], [$model, $deleted]);
         }
 
         return $deleted;
@@ -61,14 +61,14 @@ trait SoftDeletes
         $model = $this->find($id);
 
         if (method_exists($this, 'beforeRestore')) {
-            $this->app->call([$this, 'beforeRestore'], [$model]);
+            call_user_func_array([$this, 'beforeRestore'], [$model]);
         }
 
         $this->resetModel();
         $restored = $model->restore();
 
         if (method_exists($this, 'beforeRestore')) {
-            $this->app->call([$this, 'beforeRestore'], [$model]);
+            call_user_func_array([$this, 'beforeRestore'], [$model]);
         }
 
         return $restored;

@@ -4,6 +4,7 @@ namespace UMFlint\Repository;
 
 use Illuminate\Contracts\Container\Container as Application;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;

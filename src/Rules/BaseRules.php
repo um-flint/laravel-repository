@@ -7,19 +7,21 @@ abstract class BaseRules
     /**
      * Array of rules.
      *
+     * @param  null $model
      * @return array
      */
-    abstract protected function rules(): array;
+    abstract protected function rules($model = null): array;
 
     /**
      * Get rules.
      *
      * @author Donald Wilcox <dowilcox@umflint.edu>
+     * @param null $model
      * @return array
      */
-    public static function getRules(): array
+    public static function getRules($model = null): array
     {
-        return (new static)->rules();
+        return (new static)->rules($model);
     }
 
     /**

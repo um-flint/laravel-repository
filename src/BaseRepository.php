@@ -39,6 +39,7 @@ abstract class BaseRepository implements RepositoryInterface
      *
      * @param Application       $app
      * @param ValidationFactory $validation
+     * @throws \Exception
      */
     public function __construct(Application $app, ValidationFactory $validation)
     {
@@ -62,9 +63,10 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Rules class or array of rules.
      *
+     * @param null $model
      * @return array
      */
-    abstract public function rules(): array;
+    abstract public function rules($model = null): array;
 
     /**
      * Create a new instance of the model.
@@ -99,11 +101,12 @@ abstract class BaseRepository implements RepositoryInterface
      *
      * @author Donald Wilcox <dowilcox@umflint.edu>
      * @param array $attributes
-     * @throws \Exception
+     * @param null  $model
+     * @throws ValidationException
      */
-    protected function passesOrFailsValidation(array $attributes)
+    protected function passesOrFailsValidation(array $attributes, $model = null)
     {
-        $validator = $this->validation->make($attributes, $this->rules());
+        $validator = $this->validation->make($attributes, $this->rules($model));
 
         if (!$validator->passes()) {
             throw new ValidationException($validator);
@@ -315,15 +318,15 @@ abstract class BaseRepository implements RepositoryInterface
      * @param array $attributes
      *
      * @return mixed
+     * @throws \Exception
      */
     public function create(array $attributes)
     {
-        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
-
         if (method_exists($this, 'beforeCreate')) {
             call_user_func_array([$this, 'beforeCreate'], [&$attributes]);
         }
 
+        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
         $this->passesOrFailsValidation($attributes);
         $model = $this->model->newInstance($attributes);
         $model->save();
@@ -344,18 +347,19 @@ abstract class BaseRepository implements RepositoryInterface
      * @param       $id
      *
      * @return mixed
+     * @throws \Exception
      */
     public function update(array $attributes, $id)
     {
         $this->applyScope();
-        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
         $model = $this->model->findOrFail($id);
 
         if (method_exists($this, 'beforeUpdate')) {
             call_user_func_array([$this, 'beforeUpdate'], [$model, &$attributes]);
         }
 
-        $this->passesOrFailsValidation($attributes);
+        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
+        $this->passesOrFailsValidation($attributes, $model);
         $model->fill($attributes);
         $model->save();
 

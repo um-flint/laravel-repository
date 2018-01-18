@@ -72,7 +72,7 @@ abstract class BaseRepository implements RepositoryInterface
      * Create a new instance of the model.
      *
      * @author Donald Wilcox <dowilcox@umflint.edu>
-     * @return Model
+     * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Exception
      */
     public function makeModel()
@@ -83,7 +83,7 @@ abstract class BaseRepository implements RepositoryInterface
             throw new \Exception("Class {$this->model()} must be an instance of Illuminate\\Database\\Eloquent\\Model");
         }
 
-        return $this->model = $model;
+        return $this->model = $model->newQuery();
     }
 
     /**
@@ -176,7 +176,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function all($columns = ['*'])
     {
-        $this->applyScope();
 
         if ($this->model instanceof Builder) {
             $results = $this->model->get($columns);
@@ -201,7 +200,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function paginate($limit = null, $columns = ['*'], $method = 'paginate')
     {
-        $this->applyScope();
         $limit = $limit ?? 15;
         $results = $this->model->{$method}($limit, $columns);
         $results->appends($this->app->make('request')->query());
@@ -233,7 +231,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find($id, $columns = ['*'])
     {
-        $this->applyScope();
         $model = $this->model->findOrFail($id, $columns);
         $this->resetModel();
 
@@ -251,7 +248,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findByField($field, $value, $columns = ['*'])
     {
-        $this->applyScope();
         $model = $this->model->where($field, $value)->get($columns);
         $this->resetModel();
 
@@ -268,7 +264,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findWhere(array $where, $columns = ['*'])
     {
-        $this->applyScope();
         $this->applyConditions($where);
         $model = $this->model->get($columns);
         $this->resetModel();
@@ -287,7 +282,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findWhereIn($field, array $values, $columns = ['*'])
     {
-        $this->applyScope();
         $model = $this->model->whereIn($field, $values)->get($columns);
         $this->resetModel();
 
@@ -305,7 +299,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findWhereNotIn($field, array $values, $columns = ['*'])
     {
-        $this->applyScope();
         $model = $this->model->whereNotIn($field, $values)->get($columns);
         $this->resetModel();
 
@@ -351,7 +344,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function update(array $attributes, $id)
     {
-        $this->applyScope();
         $model = $this->model->findOrFail($id);
 
         if (method_exists($this, 'beforeUpdate')) {
@@ -381,7 +373,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function delete($id)
     {
-        $this->applyScope();
         $model = $this->find($id);
 
         if (method_exists($this, 'beforeDelete')) {
@@ -408,7 +399,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function orderBy($column, $direction = 'asc')
     {
-        $this->model = $this->model->orderBy($column, $direction);
+        $this->model->orderBy($column, $direction);
 
         return $this;
     }
@@ -422,7 +413,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function has($relation)
     {
-        $this->model = $this->model->has($relation);
+        $this->model->has($relation);
 
         return $this;
     }
@@ -436,7 +427,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function with($relations)
     {
-        $this->model = $this->model->with($relations);
+        $this->model->with($relations);
 
         return $this;
     }
@@ -451,7 +442,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function whereHas($relation, $closure)
     {
-        $this->model = $this->model->whereHas($relation, $closure);
+        $this->model->whereHas($relation, $closure);
 
         return $this;
     }
@@ -464,7 +455,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function withCount($relations)
     {
-        $this->model = $this->model->withCount($relations);
+        $this->model->withCount($relations);
 
         return $this;
     }
@@ -506,35 +497,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function scopeQuery(\Closure $scope)
     {
-        $this->scopeQuery->push($scope);
-
-        return $this;
-    }
-
-    /**
-     * Reset Query Scope
-     *
-     * @return $this
-     */
-    public function resetScope()
-    {
-        $this->scopeQuery = new Collection();
-
-        return $this;
-    }
-
-    /**
-     * Apply scope in current Query
-     *
-     * @return $this
-     */
-    protected function applyScope()
-    {
-        foreach ($this->scopeQuery as $scopeQuery) {
-            if (is_callable($scopeQuery)) {
-                $this->model = $scopeQuery($this->model);
-            }
-        }
+        $scope($this->model);
 
         return $this;
     }

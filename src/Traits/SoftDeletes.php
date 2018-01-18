@@ -13,7 +13,7 @@ trait SoftDeletes
     public function withTrashed()
     {
         return $this->scopeQuery(function ($query) {
-            return $query->withTrashed();
+            $query->withTrashed();
         });
     }
 
@@ -27,7 +27,6 @@ trait SoftDeletes
      */
     public function delete($id, $force = false)
     {
-        $this->applyScope();
         $model = $this->find($id);
         $this->resetModel();
 
@@ -57,7 +56,6 @@ trait SoftDeletes
      */
     public function restore($id)
     {
-        $this->applyScope();
         $model = $this->find($id);
 
         if (method_exists($this, 'beforeRestore')) {

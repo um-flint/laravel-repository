@@ -40,7 +40,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->app = $app;
         $this->validation = $validation;
-        $this->makeModel();
+        $this->model = $this->makeModel();
 
         if (method_exists($this, 'boot')) {
             $this->app->call([$this, 'boot']);
@@ -77,7 +77,7 @@ abstract class BaseRepository implements RepositoryInterface
             throw new \Exception("Class {$this->model()} must be an instance of Illuminate\\Database\\Eloquent\\Model");
         }
 
-        return $this->model = $model->newQuery();
+        return $model->newQuery();
     }
 
     /**
@@ -87,7 +87,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function resetModel()
     {
-        $this->makeModel();
+        $this->model = $this->makeModel();
     }
 
     /**
@@ -312,9 +312,9 @@ abstract class BaseRepository implements RepositoryInterface
             call_user_func_array([$this, 'beforeCreate'], [&$attributes]);
         }
 
-        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
+        $attributes = $this->makeModel()->forceFill($attributes)->toArray();
         $this->passesOrFailsValidation($attributes);
-        $model = $this->model->newInstance($attributes);
+        $model = $this->model->fill($attributes);
         $model->save();
 
         if (method_exists($this, 'afterCreate')) {
@@ -343,7 +343,7 @@ abstract class BaseRepository implements RepositoryInterface
             call_user_func_array([$this, 'beforeUpdate'], [$model, &$attributes]);
         }
 
-        $attributes = $this->model->newInstance()->forceFill($attributes)->toArray();
+        $attributes = $this->makeModel()->forceFill($attributes)->toArray();
         $this->passesOrFailsValidation($attributes, $model);
         $model->fill($attributes);
         $model->save();

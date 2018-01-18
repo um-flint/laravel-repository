@@ -28,7 +28,6 @@ trait SoftDeletes
     public function delete($id, $force = false)
     {
         $model = $this->find($id);
-        $this->resetModel();
 
         if (method_exists($this, 'beforeDelete')) {
             call_user_func_array([$this, 'beforeDelete'], [$model]);
@@ -62,7 +61,6 @@ trait SoftDeletes
             call_user_func_array([$this, 'beforeRestore'], [$model]);
         }
 
-        $this->resetModel();
         $restored = $model->restore();
 
         if (method_exists($this, 'beforeRestore')) {

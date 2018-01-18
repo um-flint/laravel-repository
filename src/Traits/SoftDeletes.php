@@ -12,9 +12,9 @@ trait SoftDeletes
      */
     public function withTrashed()
     {
-        return $this->scopeQuery(function ($query) {
-            $query->withTrashed();
-        });
+        $this->withTrashed();
+
+        return $this;
     }
 
     /**

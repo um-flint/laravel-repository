@@ -55,7 +55,7 @@ trait SoftDeletes
      */
     public function restore($id)
     {
-        $model = $this->find($id);
+        $model = $this->withTrashed()->find($id);
 
         if (method_exists($this, 'beforeRestore')) {
             call_user_func_array([$this, 'beforeRestore'], [$model]);

@@ -12,7 +12,7 @@ trait SoftDeletes
      */
     public function withTrashed()
     {
-        $this->withTrashed();
+        $this->query->withTrashed();
 
         return $this;
     }

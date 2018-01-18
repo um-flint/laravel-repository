@@ -6,7 +6,6 @@ use Illuminate\Contracts\Container\Container as Application;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use UMFlint\Repository\Contracts\closure;
 use UMFlint\Repository\Contracts\RepositoryInterface;
@@ -29,10 +28,6 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected $model;
 
-    /**
-     * @var Collection
-     */
-    protected $scopeQuery;
 
     /**
      * BaseRepository constructor.
@@ -45,7 +40,6 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->app = $app;
         $this->validation = $validation;
-        $this->scopeQuery = new Collection();
         $this->makeModel();
 
         if (method_exists($this, 'boot')) {
@@ -184,7 +178,6 @@ abstract class BaseRepository implements RepositoryInterface
         }
 
         $this->resetModel();
-        $this->resetScope();
 
         return $results;
     }

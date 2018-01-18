@@ -81,6 +81,20 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * Cast attributes from the model.
+     *
+     * @author Donald Wilcox <dowilcox@umflint.edu>
+     * @param array $attributes
+     * @return array
+     */
+    public function castAttributes(array $attributes): array
+    {
+        $model = $this->app->make($this->model());
+
+        return $model->forceFill($attributes)->toArray();
+    }
+
+    /**
      * Reset the model.
      *
      * @author Donald Wilcox <dowilcox@umflint.edu>
@@ -312,7 +326,7 @@ abstract class BaseRepository implements RepositoryInterface
             call_user_func_array([$this, 'beforeCreate'], [&$attributes]);
         }
 
-        $attributes = $this->makeModel()->forceFill($attributes)->toArray();
+        $attributes = $this->castAttributes($attributes);
         $this->passesOrFailsValidation($attributes);
         $model = $this->model->fill($attributes);
         $model->save();
@@ -343,7 +357,7 @@ abstract class BaseRepository implements RepositoryInterface
             call_user_func_array([$this, 'beforeUpdate'], [$model, &$attributes]);
         }
 
-        $attributes = $this->makeModel()->forceFill($attributes)->toArray();
+        $attributes = $this->castAttributes($attributes);
         $this->passesOrFailsValidation($attributes, $model);
         $model->fill($attributes);
         $model->save();

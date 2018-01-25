@@ -55,12 +55,23 @@ abstract class BaseRepository implements RepositoryInterface
     abstract public function model(): string;
 
     /**
-     * Rules class or array of rules.
+     * Array of rules for validation.
      *
      * @param null $model
      * @return array
      */
     abstract public function rules($model = null): array;
+
+    /**
+     * Array of messages for validation.
+     *
+     * @author Donald Wilcox <dowilcox@umflint.edu>
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [];
+    }
 
     /**
      * Create a new instance of the model.
@@ -132,7 +143,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function passesOrFailsValidation(array $attributes, $model = null)
     {
-        $validator = $this->validation->make($attributes, $this->rules($model));
+        $validator = $this->validation->make($attributes, $this->rules($model), $this->messages());
 
         if (!$validator->passes()) {
             throw new ValidationException($validator);

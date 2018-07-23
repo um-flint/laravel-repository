@@ -7,9 +7,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
-use UMFlint\Repository\Contracts\closure;
 use UMFlint\Repository\Contracts\RepositoryInterface;
-use UMFlint\Repository\Contracts\ValidatorException;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -480,12 +478,12 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * Load relation with closure
      *
-     * @param string  $relation
-     * @param closure $closure
+     * @param string   $relation
+     * @param \Closure $closure
      *
      * @return $this
      */
-    public function whereHas($relation, $closure)
+    public function whereHas($relation, \Closure $closure)
     {
         $this->query->whereHas($relation, $closure);
 

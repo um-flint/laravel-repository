@@ -190,12 +190,12 @@ interface RepositoryInterface
     /**
      * Load relation with closure
      *
-     * @param string  $relation
-     * @param closure $closure
+     * @param string   $relation
+     * @param \Closure $closure
      *
      * @return $this
      */
-    public function whereHas($relation, $closure);
+    public function whereHas($relation, \Closure $closure);
 
     /**
      * Add subselect queries to count the relations.

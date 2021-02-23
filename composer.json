@@ -3,10 +3,10 @@
     "description": "A repository pattern for Laravel.",
     "require": {
         "php": ">=7.1.0",
-        "illuminate/support": "^5.5",
-        "illuminate/validation": "^5.5",
-        "illuminate/database": "^5.5",
-        "illuminate/pagination": "^5.5"
+        "illuminate/support": "5.7.*",
+        "illuminate/validation": "5.7.*",
+        "illuminate/database": "5.7.*",
+        "illuminate/pagination": "5.7.*"
     },
     "autoload": {
         "psr-4": {

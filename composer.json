@@ -2,11 +2,11 @@
     "name": "um-flint/laravel-repository",
     "description": "A repository pattern for Laravel.",
     "require": {
-        "php": ">=7.0.0",
-        "illuminate/support": "5.5.*",
-        "illuminate/validation": "5.5.*",
-        "illuminate/database": "5.5.*",
-        "illuminate/pagination": "5.5.*"
+        "php": ">=7.1.0",
+        "illuminate/support": "^5.5",
+        "illuminate/validation": "^5.5",
+        "illuminate/database": "^5.5",
+        "illuminate/pagination": "^5.5"
     },
     "autoload": {
         "psr-4": {
